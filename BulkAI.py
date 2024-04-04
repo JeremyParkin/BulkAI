@@ -60,7 +60,7 @@ with st.expander("Instructions"):
 with st.sidebar:
     st.header("Custom Prompt:")
     custom_prompt = st.text_area("Enter your analysis prompt here:",
-                                 "Please analyze the following story to see if any Yamaha spokespeople appear in it. If yes, list the names. If no, respond with just the word 'No': ",
+                                 "Please analyze the following story to see if any Yamaha products appear in it. If yes, respond with only the list of names. If no, respond with just the word 'No': ",
                                  height=250)
 
     # Row limit input
