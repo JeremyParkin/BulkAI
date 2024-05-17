@@ -100,7 +100,7 @@ if upload_file:
             full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row['Coverage Snippet']}"
             try:
                 response = client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=[
                         {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
                         {"role": "user", "content": full_prompt}
