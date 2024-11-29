@@ -83,29 +83,11 @@ if upload_file:
         for i, row in df.iterrows():
             full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row['Coverage Snippet']}"
             try:
-                response = openai.Chat.create(
+                response = openai.ChatCompletion.create(
                     model="gpt-4",
                     messages=[
                         {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
                         {"role": "user", "content": full_prompt}
                     ]
                 )
-                responses.append(response['choices'][0]['message']['content'].strip())
-            except openai.OpenAIError as e:
-                responses.append(f"Error: {e}")
-
-            progress_bar.progress((i + 1) / total_stories)
-
-        df['Analysis'] = responses
-        st.dataframe(df)
-
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, sheet_name='Sheet1', index=False)
-        output.seek(0)
-        st.download_button(
-            label="Download analysis results as Excel file",
-            data=output,
-            file_name="analysis_results.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
+                res
