@@ -83,7 +83,7 @@ if upload_file:
         for i, row in df.iterrows():
             full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row['Coverage Snippet']}"
             try:
-                response = openai.ChatCompletion.create(
+                response = openai.Chat.create(
                     model="gpt-4",
                     messages=[
                         {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
