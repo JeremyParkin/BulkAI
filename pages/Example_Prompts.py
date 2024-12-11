@@ -41,9 +41,9 @@ with st.expander("Topic finder"):
 with st.expander("Sentiment"):
     f"""
     Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-    POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths. 
-    NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
-    NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
+    POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths. \n
+    NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.\n
+    NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.\n
     Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
     Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment. 
     If {named_entity} is not mentioned in the story, please reply with the phrase "NOT RELEVANT". Here is the story:
