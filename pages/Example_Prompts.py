@@ -7,15 +7,16 @@ st.set_page_config(page_title="MIG Freeform Analysis Tool",
                    layout="wide")
 
 
-st.header("Examples")
-
+st.header("Example Prompts")
+st.subheader("Client Info")
 named_entity = st.text_input("Named Entity", "")
 if len(named_entity) == 0:
     named_entity = "[BRAND]"
 
 topic_list = st.text_input("Comma seperated topic List", "")
-st.write("Update the prompt examples with the appropriate brand names and details for your use case.")
+st.subheader("Example Prompts")
 st.info("NOTE: These prompts are not perfect. They may not even be good. They are just examples to get you started.")
+st.write("Update the prompt examples with the appropriate details for your use case and refine as needed.")
 
 
 with st.expander("Product finder"):
