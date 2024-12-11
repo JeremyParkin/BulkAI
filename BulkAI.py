@@ -5,7 +5,7 @@ import io
 import concurrent.futures
 from openai import OpenAI
 import time
-
+from threading import Lock
 
 client = OpenAI(api_key=st.secrets["key"])
 
@@ -14,13 +14,15 @@ st.set_page_config(page_title="MIG Freeform Analysis Tool",
                    page_icon="https://www.agilitypr.com/wp-content/uploads/2018/02/favicon-192.png",
                    layout="wide")
 
+
 # Create a login
 def check_password():
-    """Returns `True` if the user had the correct username and password."""
+    """Returns True if the user had the correct username and password."""
 
     def credentials_entered():
         """Checks whether a username and password entered by the user are correct."""
-        if st.session_state["username"] == st.secrets["USERNAME"] and st.session_state["password"] == st.secrets["PASSWORD"]:
+        if st.session_state["username"] == st.secrets["USERNAME"] and st.session_state["password"] == st.secrets[
+            "PASSWORD"]:
             st.session_state["password_correct"] = True
             del st.session_state["password"]  # Don't store the password.
             del st.session_state["username"]  # Don't store the username.
@@ -37,6 +39,7 @@ def check_password():
     if "password_correct" in st.session_state:
         st.error("\ud83d\ude15 Username or password incorrect")
     return False
+
 
 if not check_password():
     st.stop()  # Do not continue if check_password is not True.
@@ -92,8 +95,16 @@ if upload_file:
         total_stories = len(df)
 
         token_counts = {"input_tokens": 0, "output_tokens": 0}  # Use a dictionary to store token counts
+        progress = {"completed": 0}  # Progress tracking
+        lock = Lock()  # Thread-safe lock
 
         start_time = time.time()
+
+
+        def update_progress():
+            with lock:
+                progress["completed"] += 1
+
 
         def analyze_story(row, index):
             snippet_column = "Coverage Snippet" if "Coverage Snippet" in df.columns else "Snippet"
@@ -106,23 +117,28 @@ if upload_file:
                         {"role": "user", "content": full_prompt}
                     ]
                 )
-                responses[index] = response.choices[0].message.content.strip()
-                token_counts["input_tokens"] += response.usage.prompt_tokens
-                token_counts["output_tokens"] += response.usage.completion_tokens
+                with lock:
+                    responses[index] = response.choices[0].message.content.strip()
+                    token_counts["input_tokens"] += response.usage.prompt_tokens
+                    token_counts["output_tokens"] += response.usage.completion_tokens
             except openai.OpenAIError as e:
-                responses[index] = f"Error: {e}"
+                with lock:
+                    responses[index] = f"Error: {e}"
+            update_progress()
 
 
         # Use ThreadPoolExecutor for parallel processing
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             future_to_index = {executor.submit(analyze_story, row, i): i for i, row in df.iterrows()}
-            for future in concurrent.futures.as_completed(future_to_index):
-                i = future_to_index[future]
-                try:
-                    future.result()
-                except Exception as e:
-                    responses[i] = f"Error: {e}"
-                progress_bar.progress(1 - (responses.count(None) / total_stories))
+
+            # Main thread monitors progress
+            while progress["completed"] < total_stories:
+                completed = progress["completed"]
+                progress_bar.progress(completed / total_stories)
+                time.sleep(0.1)  # Adjust as needed to reduce UI lag
+
+        # Ensure progress bar is set to 100% at the end
+        progress_bar.progress(1.0)
 
         df['Analysis'] = responses
 
@@ -133,9 +149,7 @@ if upload_file:
         st.write(f"**Stories Analyzed:** {total_stories}")
         st.write(f"**Time Taken:** {elapsed_time:.2f} seconds")
 
-
         st.dataframe(df)
-
 
         # Display token usage
         st.write(f"**Total Input Tokens:** {token_counts['input_tokens']}")
