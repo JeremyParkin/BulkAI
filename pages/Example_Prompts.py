@@ -39,7 +39,7 @@ with st.expander("Topic finder"):
     """
 
 with st.expander("Sentiment"):
-    """
+    f"""
     Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
     POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths. 
     NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
